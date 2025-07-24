@@ -1,6 +1,7 @@
 import React from "react";
 import { Layout, Row, Col, Typography } from "antd";
-import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaYoutube } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import logo from "../../assets/logo.png";
 
 const { Footer } = Layout;
@@ -218,7 +219,7 @@ const DashboardFooter = () => {
                 <div style={{ display: "flex", gap: 8 }}>
                   {[
                     { icon: <FaFacebookF />, name: "Facebook", url: "https://facebook.com", color: "#1877F2" },
-                    { icon: <FaTwitter />, name: "Twitter", url: "https://twitter.com", color: "#1DA1F2" },
+                    { icon: <FaXTwitter />, name: "X", url: "https://x.com", color: "#000000" },
                     { icon: <FaInstagram />, name: "Instagram", url: "https://instagram.com", color: "#E4405F" },
                     { icon: <FaYoutube />, name: "YouTube", url: "https://youtube.com", color: "#FF0000" }
                   ].map((social, i) => (

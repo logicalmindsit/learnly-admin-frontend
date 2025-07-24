@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DashboardContent from "./DashboardContent";
+import { Spin } from "antd";
 import axios from "../../Utils/api";
 
 /**
@@ -13,7 +14,7 @@ import axios from "../../Utils/api";
 const DashboardWithData = () => {
   const [dashboardData, setDashboardData] = useState({
     totalUsers: 1520,
-    totalCourses: 78,
+    totalCourses: 0,
     activeSubscriptions: 1245,
     completionRate: 86,
     loading: false
@@ -35,13 +36,13 @@ const DashboardWithData = () => {
       const totalUsers = usersResponse.data.data?.length || 1520;
 
       // Fetch courses data
-      let totalCourses = 78; // Default fallback
+      let totalCourses = 0; // Default fallback
       if (token) {
         try {
           const coursesResponse = await axios.get("/getcoursesname", {
             headers: { Authorization: `Bearer ${token}` },
           });
-          totalCourses = coursesResponse.data?.length || 78;
+          totalCourses = coursesResponse.data?.length || 0;
         } catch (courseError) {
           console.warn("Failed to fetch courses, using default value:", courseError);
         }
@@ -65,19 +66,13 @@ const DashboardWithData = () => {
   };
 
   if (dashboardData.loading) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        fontSize: '18px',
-        color: '#666'
-      }}>
-        Loading dashboard data...
+  return (
+      <div style={styles.loadingContainer}>
+        <Spin size="large" tip="Loading proposals..." />
       </div>
     );
   }
+
 
   return (
     <DashboardContent
@@ -89,4 +84,12 @@ const DashboardWithData = () => {
   );
 };
 
+const styles = {
+    loadingContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+  },
+}
 export default DashboardWithData;

@@ -1,7 +1,7 @@
 // DashboardContent.js
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import DefaultDashboard from "../Components/Dashboard/DashboardWithData"; 
+import DefaultDashboard from "../Components/Dashboard/DashboardWithData";
 
 //Sidebar routes
 import Admin from "../Components/Pages/Admin-dashboard/Admin-dashboard";
@@ -68,6 +68,8 @@ import MeetingFees from "../Components/Pages/DirectMeet-Management/MeetingFees";
 
 // institutional-board
 import InstitutionalDashboard from "../Components/Pages/Institutional-dashboard/Institutional-dashboard";
+// Marketing-dashboard
+import MarketingDashboard from "../Components/Pages/Marketing-dashboard/A-MarketingDashboard";
 // document-verification
 import DocumentVerificationDashboard from "../Components/Pages/Document-Verification/Document-Verification";
 // certificate-maintenance
@@ -141,7 +143,10 @@ const PageRoutes = () => {
       <Route path="monthly-fees" element={<MonthlyFeesManagement />} />
       <Route path="meet-materials" element={<DirectMeetStudyMaterial />} />
       <Route path="completion-certificates" element={<CourseCompletion />} />
-      <Route path="participant-certificates"element={<ParticipantCertificate />} />
+      <Route
+        path="participant-certificates"
+        element={<ParticipantCertificate />}
+      />
       <Route path="exam-marks-records" element={<ExamMarkRecords />} />
       <Route path="staff-management" element={<StaffDetailsManagement />} />
       <Route path="student-complaints" element={<StudentComplaintRecords />} />
@@ -156,10 +161,11 @@ const PageRoutes = () => {
       <Route path="manage-participants" element={<ManageParticipants />} />
       <Route path="meeting-fees" element={<MeetingFees />} />
 
-
       {/* Page routes Institutional-board */}
       <Route path="institutional-board" element={<InstitutionalDashboard />} />
-      
+
+      {/* Page routes Marketing-dashboard */}
+      <Route path="marketing-dashboard" element={<MarketingDashboard />} />
       {/* Page routes document-verification */}
       <Route
         path="document-verification"

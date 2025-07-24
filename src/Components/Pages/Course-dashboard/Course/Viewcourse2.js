@@ -276,12 +276,77 @@ const CourseDetail = () => {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.header}>
-        {course.coursename}
+      <h1
+        style={{
+          fontSize: "26px",
+          fontWeight: "600",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          padding: "10px 0",
+          borderBottom: "2px solid #eee",
+        }}
+      >
+        <span>{course.coursename} - </span>
+
+        <span
+          style={{
+            position: "relative",
+            color: "red",
+            cursor: "pointer",
+            display: "inline-block",
+          }}
+          onMouseEnter={(e) => {
+            const tooltip = e.currentTarget.querySelector(".tooltip");
+            tooltip.style.visibility = "visible";
+            tooltip.style.opacity = 1;
+          }}
+          onMouseLeave={(e) => {
+            const tooltip = e.currentTarget.querySelector(".tooltip");
+            tooltip.style.visibility = "hidden";
+            tooltip.style.opacity = 0;
+          }}
+        >
+          {course.CourseMotherId}
+          <span
+            className="tooltip"
+            style={{
+              visibility: "hidden",
+              opacity: 0,
+              transition: "opacity 0.3s",
+              position: "absolute",
+              bottom: "125%",
+              left: "50%",
+              transform: "translateX(-50%)",
+              backgroundColor: "#333",
+              color: "#fff",
+              padding: "5px 8px",
+              borderRadius: "4px",
+              whiteSpace: "nowrap",
+              zIndex: 100,
+              fontSize: "12px",
+              pointerEvents: "none",
+            }}
+          >
+            Mother ID
+          </span>
+        </span>
+
         <button
-          style={styles.editButton}
+          style={{
+            marginLeft: "auto",
+            backgroundColor: "#1890ff",
+            color: "#fff",
+            border: "none",
+            padding: "6px 14px",
+            borderRadius: "5px",
+            fontSize: "14px",
+            cursor: "pointer",
+          }}
           onClick={() =>
-            navigate(`/learnly/edit-course/${encodeURIComponent(course.coursename)}`)
+            navigate(
+              `/learnly/edit-course/${encodeURIComponent(course.coursename)}`
+            )
           }
         >
           ✏️ Edit Course

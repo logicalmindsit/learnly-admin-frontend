@@ -26,8 +26,119 @@ import axios from "../../Utils/api";
 import logo from "../../assets/logo.png";
 import { Tooltip } from "antd";
 import { Badge } from "antd";
+import { hasAccess } from "../../Utils/roleBasedAccess";
 
 const { Header, Sider } = Layout;
+
+// Define menu items with role-based access
+const menuItems = [
+  {
+    key: "1",
+    label: "Dashboard",
+    icon: <DashboardOutlined />,
+    path: "/learnly",
+    roles: [
+      "superadmin",
+      "admin", 
+      "boscontroller",
+      "bosmembers",
+      "datamaintenance",
+      "coursecontroller",
+      "markettingcontroller",
+    ],
+  },
+  {
+    key: "2",
+    label: "Admin Users",
+    icon: <CrownOutlined />,
+    path: "/learnly/admin-users",
+    roles: ["superadmin"],
+  },
+  {
+    key: "3",
+    label: "Users",
+    icon: <UserOutlined />,
+    path: "/learnly/users",
+    roles: ["admin", "superadmin"],
+  },
+  {
+    key: "4",
+    label: "Courses",
+    icon: <BookOutlined />,
+    path: "/learnly/courses",
+    roles: ["coursecontroller", "admin", "superadmin"],
+  },
+  {
+    key: "5",
+    label: "BOS (Board of Studies)",
+    icon: <TeamOutlined />,
+    path: "/learnly/bos",
+    roles: ["boscontroller", "bosmembers", "superadmin"],
+  },
+  {
+    key: "6",
+    label: "Data Maintenance",
+    icon: <DatabaseOutlined />,
+    path: "/learnly/data-maintenance",
+    roles: ["datamaintenance", "superadmin"],
+  },
+  {
+    key: "7",
+    label: "Institutional Board",
+    icon: <AuditOutlined />,
+    path: "/learnly/institutional-board",
+    roles: ["superadmin"],
+  },
+  {
+    key: "8",
+    label: "DirectMeet Management",
+    icon: <SnippetsOutlined />,
+    path: "/learnly/direct-meet-management",
+    roles: ["superadmin"],
+  },
+  {
+    key: "9",
+    label: "Document Verification",
+    icon: <FileTextOutlined />,
+    path: "/learnly/document-verification",
+    roles: ["admin", "superadmin"],
+  },
+  {
+    key: "10",
+    label: "Marketing",
+    icon: <ShoppingOutlined />,
+    path: "/learnly/marketing-dashboard",
+    roles: ["markettingcontroller", "superadmin"],
+  },
+  {
+    key: "11",
+    label: "Certificate Maintenance",
+    icon: <IdcardOutlined />,
+    path: "/learnly/certificate-maintenance",
+    roles: ["admin", "superadmin"],
+  },
+  {
+    key: "12",
+    label: "Vote",
+    icon: <CheckCircleOutlined />,
+    path: "/learnly/vote",
+    roles: ["boscontroller", "bosmembers", "superadmin"],
+  },
+  {
+    key: "13",
+    label: "Notifications",
+    icon: <BellOutlined />,
+    path: "/learnly/notifications",
+    roles: ["superadmin", "admin", "boscontroller", "bosmembers", "datamaintenance", "coursecontroller", "markettingcontroller"],
+  },
+  {
+    key: "14",
+    label: "Feedback",
+    icon: <FormOutlined />,
+    path: "/learnly/feedback",
+    roles: ["superadmin", "admin"],
+  },
+];
 
 const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
   const [selectedKey, setSelectedKey] = useState("1");
@@ -113,7 +224,7 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
       "/learnly/institutional-board": "7",
       "/learnly/direct-meet-management": "8",
       "/learnly/document-verification": "9",
-      "/learnly/marketing": "10",
+      "/learnly/marketing-dashboard": "10",
       "/learnly/certificate-maintenance": "11",
       "/learnly/vote": "12",
       "/learnly/notifications": "13",
@@ -169,27 +280,42 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
   };
 
   const handleMenuClick = (item) => {
-    const routes = {
-      1: "/learnly",
-      2: "/learnly/admin-users",
-      3: "/learnly/users",
-      4: "/learnly/courses",
-      5: "/learnly/bos",
-      6: "/learnly/data-maintenance",
-      7: "/learnly/institutional-board",
-      8: "/learnly/direct-meet-management",
-      9: "/learnly/document-verification",
-      10: "/learnly/marketing",
-      11: "/learnly/certificate-maintenance",
-      12: "/learnly/vote",
-      13: "/learnly/notifications",
-      14: "/learnly/feedback",
-
-      //cot
-      //directmeet
-    };
-    navigate(routes[item.key]);
+    const selected = menuItems.find((menu) => menu.key === item.key);
+    if (selected) {
+      navigate(selected.path);
+    }
   };
+
+  // Get user role for filtering menu items
+  const userRole = user?.role || localStorage.getItem("role");
+
+  // Filter menu items based on user role using utility function
+  const accessibleMenuItems = menuItems.filter((item) => 
+    hasAccess(userRole, item.roles)
+  );
+
+  // Debug: Log role and accessible items (remove in production)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('User Role:', userRole);
+      console.log('Accessible Menu Items:', accessibleMenuItems.map(item => item.label));
+    }
+  }, [userRole, accessibleMenuItems]);
+
+  // If user has no accessible menu items, show only dashboard
+  const finalMenuItems = accessibleMenuItems.length > 0 ? accessibleMenuItems : [menuItems[0]];
+
+  // Check if current route is accessible to user
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const currentMenuItem = menuItems.find(item => item.path === currentPath);
+    
+    if (currentMenuItem && !hasAccess(userRole, currentMenuItem.roles)) {
+      // User doesn't have access to current route, redirect to dashboard
+      console.warn(`Access denied to ${currentPath} for role ${userRole}`);
+      navigate("/learnly");
+    }
+  }, [location.pathname, userRole, navigate]);
 
   return (
     <>
@@ -255,48 +381,11 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
             onClick={handleMenuClick}
             style={{ borderRight: 0 }}
           >
-            <Menu.Item key="1" icon={<DashboardOutlined />}>
-              Dashboard
-            </Menu.Item>
-            <Menu.Item key="2" icon={<CrownOutlined />}>
-              Admin Users
-            </Menu.Item>
-            <Menu.Item key="3" icon={<UserOutlined />}>
-              Users
-            </Menu.Item>
-            <Menu.Item key="4" icon={<BookOutlined />}>
-              Courses
-            </Menu.Item>
-            <Menu.Item key="5" icon={<TeamOutlined />}>
-              BOS (Board of Studies)
-            </Menu.Item>
-            <Menu.Item key="6" icon={<DatabaseOutlined />}>
-              Data Maintenance
-            </Menu.Item>
-            <Menu.Item key="7" icon={<AuditOutlined />}>
-              Institutional Board
-            </Menu.Item>
-            <Menu.Item key="8" icon={<SnippetsOutlined />}>
-              DirectMeet Management
-            </Menu.Item>
-            <Menu.Item key="9" icon={<FileTextOutlined />}>
-              Document Verification
-            </Menu.Item>
-            <Menu.Item key="10" icon={<ShoppingOutlined />}>
-              Marketing
-            </Menu.Item>
-            <Menu.Item key="11" icon={<IdcardOutlined />}>
-              Certificate Maintenance
-            </Menu.Item>
-            <Menu.Item key="12" icon={<CheckCircleOutlined />}>
-              Vote
-            </Menu.Item>
-            <Menu.Item key="13" icon={<BellOutlined />}>
-              Notifications
-            </Menu.Item>
-            <Menu.Item key="14" icon={<FormOutlined />}>
-              Feedback
-            </Menu.Item>
+            {finalMenuItems.map((item) => (
+              <Menu.Item key={item.key} icon={item.icon}>
+                {item.label}
+              </Menu.Item>
+            ))}
           </Menu>
         </div>
       </Sider>
@@ -344,23 +433,8 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
               }}
             >
               {(() => {
-                const titles = {
-                  1: "Dashboard",
-                  2: "Admin Users",
-                  3: "Users",
-                  4: "Courses",
-                  5: "BOS (Board of Studies)",
-                  6: "Data Maintenance",
-                  7: "Institutional Board",
-                  8: "DirectMeet Management",
-                  9: "Document Verification",
-                  10: "Marketing",
-                  11: "Certificate Maintenance",
-                  12: "Vote",
-                  13: "Notifications",
-                  14: "Feedback",
-                };
-                return titles[selectedKey] || "Dashboard";
+                const currentItem = finalMenuItems.find(item => item.key === selectedKey);
+                return currentItem ? currentItem.label : "Dashboard";
               })()}
             </span>
           </div>
@@ -394,7 +468,13 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
                           cursor: "pointer",
                         }}
                         icon={<BellOutlined />}
-                        onClick={() => navigate("/learnly/notifications")}
+                        onClick={() => {
+                          // Check if user has access to notifications
+                          const notificationsItem = menuItems.find(item => item.path === "/learnly/notifications");
+                          if (notificationsItem && hasAccess(userRole, notificationsItem.roles)) {
+                            navigate("/learnly/notifications");
+                          }
+                        }}
                       />
                     </Badge>
                   </div>

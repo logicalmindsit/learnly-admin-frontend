@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "../../../Utils/api";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -21,14 +21,13 @@ const ManageParticipants = () => {
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState("");
   const [participants, setParticipants] = useState([]); // This would come from a participants API
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   // Mock participants data - in real app, this would come from API
-  const mockParticipants = [
+  const mockParticipants = useMemo(() => [
     {
       id: 1,
       name: "John Doe",
@@ -56,21 +55,14 @@ const ManageParticipants = () => {
       paymentStatus: "paid",
       meetingId: "DM202501002"
     }
-  ];
+  ], []);
 
   useEffect(() => {
     fetchMeetings();
   }, []);
 
-  useEffect(() => {
-    if (selectedMeeting) {
-      fetchParticipants();
-    }
-  }, [selectedMeeting]);
-
   const fetchMeetings = async () => {
     try {
-      setLoading(true);
       const response = await axios.get("/get-all-direct-meets", {
         params: { limit: 100, is_active: true }
       });
@@ -81,12 +73,10 @@ const ManageParticipants = () => {
     } catch (error) {
       console.error("Error fetching meetings:", error);
       setError("Failed to fetch meetings. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
-  const fetchParticipants = () => {
+  const fetchParticipants = useCallback(() => {
     // Mock function - in real app, this would be an API call
     const selectedMeetingData = meetings.find(m => m._id === selectedMeeting);
     if (selectedMeetingData) {
@@ -95,7 +85,13 @@ const ManageParticipants = () => {
       );
       setParticipants(meetingParticipants);
     }
-  };
+  }, [meetings, selectedMeeting, mockParticipants]);
+
+  useEffect(() => {
+    if (selectedMeeting) {
+      fetchParticipants();
+    }
+  }, [selectedMeeting, fetchParticipants]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
