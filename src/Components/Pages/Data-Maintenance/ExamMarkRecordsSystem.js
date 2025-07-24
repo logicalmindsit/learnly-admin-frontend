@@ -1,26 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from '../../../Utils/api'; 
-
-// --- Axios API Client Setup ---
-// Create an Axios instance based on the imported base axios
-const apiClient = axios.create({
-  baseURL: 'http://localhost:8000', // Your API's base URL.
-});
-
-// Add a request interceptor to include the token
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-// --- End Axios API Client Setup ---
+import axios from '../../../Utils/api';
 
 
 // Define style constants
@@ -165,7 +144,7 @@ const ExamMarkManagement = () => {
       if (filters.grade) params.append('grade', filters.grade);
       if (filters.status) params.append('status', filters.status);
 
-      const response = await apiClient.get(`/exam-records/all?${params.toString()}`);
+      const response = await axios.get(`/exam-records/all?${params.toString()}`);
       setRecordsData(response.data.data);
       setTotalPages(response.data.pages);
       setTotalRecords(response.data.total);
@@ -181,7 +160,7 @@ const ExamMarkManagement = () => {
   const fetchStatistics = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get('/exam-records/statistics');
+      const response = await axios.get('/exam-records/statistics');
       setStatistics(response.data.data);
     } catch (error) {
       console.error('Failed to fetch statistics:', error);
@@ -238,7 +217,7 @@ const ExamMarkManagement = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      await apiClient.post('/exam-records/create', {
+      await axios.post('/exam-records/create', {
         ...formData,
         percentage: parseFloat(formData.percentage),
         mark: parseFloat(formData.mark),
@@ -271,7 +250,7 @@ const ExamMarkManagement = () => {
     if (!validateForm() || !selectedRecord) return;
     setLoading(true);
     try {
-      await apiClient.put(`/exam-records/update/${selectedRecord._id}`, {
+      await axios.put(`/exam-records/update/${selectedRecord._id}`, {
         ...formData,
         percentage: parseFloat(formData.percentage),
         mark: parseFloat(formData.mark),
@@ -290,7 +269,7 @@ const ExamMarkManagement = () => {
   const handleDownloadRecords = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get('/exam-records/download', { responseType: 'blob' });
+      const response = await axios.get('/exam-records/download', { responseType: 'blob' });
       const blob = new Blob([response.data], { type: 'application/json' });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);

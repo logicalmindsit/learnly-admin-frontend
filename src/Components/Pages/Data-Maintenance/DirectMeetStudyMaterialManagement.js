@@ -1,22 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from '../../../Utils/api'; 
-
-// --- Axios API Client Setup ---
-const apiClient = axios.create({
-  baseURL: 'http://localhost:8000', // Your API's base URL.
-});
-
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-// --- End Axios API Client Setup ---
+import axios from '../../../Utils/api';
 
 // Style Constants
 const colors = {
@@ -126,7 +109,7 @@ const DirectMeetStudyMaterialManagement = () => {
   const fetchStudyMaterials = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get('/direct-meet-study-material/get');
+      const response = await axios.get('/direct-meet-study-material/get');
       setStudyMaterials(response.data.studyMaterials);
     } catch (error) {
       console.error('Failed to fetch study materials:', error);
@@ -176,7 +159,7 @@ const DirectMeetStudyMaterialManagement = () => {
     uploadFormData.append('file', selectedFile);
 
     try {
-      await apiClient.post('/direct-meet-study-material/post', uploadFormData, {
+      await axios.post('/direct-meet-study-material/post', uploadFormData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccessMessage('Study material uploaded successfully!');
@@ -217,7 +200,7 @@ const DirectMeetStudyMaterialManagement = () => {
     try {
       // Only send title and description for update as per backend
       const updateData = { title: formData.title, description: formData.description, fileUrl: formData.fileUrl };
-      await apiClient.put(`/direct-meet-study-material/${selectedMaterial._id}`, updateData);
+      await axios.put(`/direct-meet-study-material/${selectedMaterial._id}`, updateData);
       setSuccessMessage('Study material updated successfully!');
       setShowEditModal(false); resetForm(); fetchStudyMaterials();
     } catch (error) {
@@ -233,7 +216,7 @@ const DirectMeetStudyMaterialManagement = () => {
     if (window.confirm('Are you sure you want to delete this study material?')) {
       setLoading(true);
       try {
-        await apiClient.delete(`/direct-meet-study-material/${materialId}`);
+        await axios.delete(`/direct-meet-study-material/${materialId}`);
         setSuccessMessage('Study material deleted successfully!');
         fetchStudyMaterials();
       } catch (error) {

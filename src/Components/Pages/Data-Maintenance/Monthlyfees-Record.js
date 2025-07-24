@@ -1,26 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from '../../../Utils/api'; 
-
-// --- Axios API Client Setup ---
-// Create an Axios instance
-const apiClient = axios.create({
-  baseURL: 'http://localhost:8000', // Your API's base URL.
-});
-
-// Add a request interceptor to include the token
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-// --- End Axios API Client Setup ---
+import axios from '../../../Utils/api';
 
 // Define style constants
 const colors = {
@@ -146,7 +125,7 @@ const MonthlyFeesManagement = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page: currentPage, limit });
-      const response = await apiClient.get(`/get-monthly-fees?${params.toString()}`);
+      const response = await axios.get(`/get-monthly-fees?${params.toString()}`);
       setFeesData(response.data.fees);
       setTotalPages(response.data.totalPages);
       setTotalRecords(response.data.totalRecords);
@@ -190,7 +169,7 @@ const MonthlyFeesManagement = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      await apiClient.post('/post-monthly-fees', {
+      await axios.post('/post-monthly-fees', {
         ...formData,
         amount: parseFloat(formData.amount),
       });
@@ -222,7 +201,7 @@ const MonthlyFeesManagement = () => {
     if (!validateForm() || !selectedFee) return;
     setLoading(true);
     try {
-      await apiClient.put(`/put-monthly-fees/${selectedFee._id}`, {
+      await axios.put(`/put-monthly-fees/${selectedFee._id}`, {
         ...formData,
         amount: parseFloat(formData.amount),
       });
@@ -241,7 +220,7 @@ const MonthlyFeesManagement = () => {
     if (window.confirm('Are you sure you want to delete this fee record?')) {
       setLoading(true);
       try {
-        await apiClient.delete(`/delete-monthly-fees/${feeId}`);
+        await axios.delete(`/delete-monthly-fees/${feeId}`);
         setSuccessMessage('Monthly fee deleted successfully!');
         fetchFees(); // Refresh the list
       } catch (error) {
@@ -309,7 +288,7 @@ const MonthlyFeesManagement = () => {
         borderRadius: '16px',
         color: colors.white,
         backgroundColor: colors.statusColors[status] || colors.textLight,
-        textTransform: 'capitalize',
+        textTransform: 'caxiostalize',
         minWidth: '70px',
         textAlign: 'center',
         display: 'inline-block',

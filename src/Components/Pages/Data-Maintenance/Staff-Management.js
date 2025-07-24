@@ -1,27 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "../../../Utils/api";
 
-// --- Axios API Client Setup ---
-// Create an Axios instance based on the imported base axios
-const apiClient = axios.create({
-  baseURL: "http://localhost:8000", // Your API's base URL. All requests will be prefixed with this.
-});
-
-// Add a request interceptor to include the token
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token"); // Using 'token' as specified by user
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-// --- End Axios API Client Setup ---
-
 // Define style constants for better organization and reusability
 const colors = {
   primary: "#4F46E5", // indigo-600
@@ -441,7 +420,7 @@ const StaffManagement = () => {
   const fetchStaff = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get(
+      const response = await axios.get(
         `/get-staff-all?page=${currentPage}&limit=${limit}&search=${searchTerm}`
       );
       setStaffData(response.data.staff);
@@ -517,7 +496,7 @@ const StaffManagement = () => {
           formPayload.append(key, formData[key]);
       });
 
-      await apiClient.post("/post-create-staff", formPayload, {
+      await axios.post("/post-create-staff", formPayload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setSuccessMessage("Staff created successfully!");
@@ -549,7 +528,7 @@ const StaffManagement = () => {
           formPayload.append(key, formData[key]);
       });
 
-      await apiClient.put(
+      await axios.put(
         `/update-staff/${selectedStaff._id}/image`,
         formPayload,
         {
@@ -575,7 +554,7 @@ const StaffManagement = () => {
     if (window.confirm("Are you sure you want to delete this staff member?")) {
       setLoading(true);
       try {
-        await apiClient.delete(`/delete-staff/${id}`);
+        await axios.delete(`/delete-staff/${id}`);
         setSuccessMessage("Staff deleted successfully!");
         fetchStaff();
       } catch (error) {

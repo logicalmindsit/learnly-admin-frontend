@@ -1,22 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from '../../../Utils/api'; 
-
-// --- Axios API Client Setup ---
-const apiClient = axios.create({
-  baseURL: 'http://localhost:8000', // Your API's base URL.
-});
-
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-// --- End Axios API Client Setup ---
+import axios from '../../../Utils/api';
 
 // Style Constants
 const colors = {
@@ -154,7 +137,7 @@ const StudentComplaintManagement = () => {
     try {
       const params = new URLSearchParams({ page: currentPage, limit });
       if (filterStatus) params.append('status', filterStatus);
-      const response = await apiClient.get(`/complaint/all?${params.toString()}`);
+      const response = await axios.get(`/complaint/all?${params.toString()}`);
       setComplaintsData(response.data.complaints);
       setTotalPages(response.data.totalPages);
       setTotalRecords(response.data.totalCount);
@@ -204,7 +187,7 @@ const StudentComplaintManagement = () => {
     if (!validateCreateForm()) return;
     setLoading(true);
     try {
-      await apiClient.post('/complaint/create', createFormData);
+      await axios.post('/complaint/create', createFormData);
       setSuccessMessage('Complaint submitted successfully!');
       setShowCreateModal(false); resetCreateForm(); fetchComplaints();
     } catch (error) {
@@ -241,7 +224,7 @@ const StudentComplaintManagement = () => {
     if (!validateUpdateStatusForm() || !selectedComplaint) return;
     setLoading(true);
     try {
-      await apiClient.put(`/complaint/update-status/${selectedComplaint._id}`, updateStatusFormData);
+      await axios.put(`/complaint/update-status/${selectedComplaint._id}`, updateStatusFormData);
       setSuccessMessage('Complaint status updated successfully!');
       setShowUpdateStatusModal(false); fetchComplaints();
     } catch (error) {
@@ -258,7 +241,7 @@ const StudentComplaintManagement = () => {
     if (window.confirm('Are you sure you want to delete this complaint? This action cannot be undone.')) {
       setLoading(true);
       try {
-        await apiClient.delete(`/complaint/delete/${complaintId}`);
+        await axios.delete(`/complaint/delete/${complaintId}`);
         setSuccessMessage('Complaint deleted successfully!');
         fetchComplaints(); // Refresh list
       } catch (error) {
@@ -325,7 +308,7 @@ const StudentComplaintManagement = () => {
     badge: (status) => ({
         padding: '5px 12px', fontSize: '12px', fontWeight: '600', borderRadius: '16px',
         color: colors.white, backgroundColor: colors.statusColors[status] || colors.textLight,
-        textTransform: 'capitalize', minWidth: '80px', textAlign: 'center', display: 'inline-block',
+        textTransform: 'caxiostalize', minWidth: '80px', textAlign: 'center', display: 'inline-block',
     }),
   };
   const statusOptionsForFilter = ["Pending", "Resolved", "Rejected"];
