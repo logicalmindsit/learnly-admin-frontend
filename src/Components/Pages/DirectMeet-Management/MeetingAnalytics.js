@@ -14,7 +14,6 @@ import {
   FiDownload,
   FiClock,
   FiCheckCircle,
-  FiAlertCircle
 } from "react-icons/fi";
 
 const MeetingAnalytics = () => {

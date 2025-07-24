@@ -24,13 +24,6 @@ const bosTools = [
     color: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
   },
   {
-    name: "Proposal Votes",
-    description: "Track and record voting on academic proposals.",
-    icon: "🗳️",
-    path: "/learnly/proposal-votes",
-    color: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-  },
-  {
     name: "Pending Proposals",
     description: "View and take action on pending course proposals.",
     icon: "⏳",

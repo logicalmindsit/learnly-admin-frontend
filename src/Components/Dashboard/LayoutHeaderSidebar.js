@@ -21,6 +21,7 @@ import {
   ShoppingOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../Auth/AuthProvider";
 import axios from "../../Utils/api";
 import logo from "../../assets/logo.png";
 import { Tooltip } from "antd";
@@ -29,14 +30,12 @@ import { Badge } from "antd";
 const { Header, Sider } = Layout;
 
 const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
-  const [userName, setUserName] = useState("");
-  const [userRole, setUserRole] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [selectedKey, setSelectedKey] = useState("1");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   // Initialize socket connection
   useEffect(() => {
@@ -104,16 +103,6 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
   }, []);
 
   useEffect(() => {
-    const storedName = localStorage.getItem("name");
-    const storedRole = localStorage.getItem("role");
-    const storedToken = localStorage.getItem("token");
-
-    if (storedName) setUserName(storedName);
-    if (storedRole) setUserRole(storedRole);
-    if (!storedToken) setIsLoggedIn(false);
-  }, []);
-
-  useEffect(() => {
     const routeKeys = {
       "/learnly": "1",
       "/learnly/admin-users": "2",
@@ -143,7 +132,7 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = user?.token || localStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found");
       }
@@ -159,17 +148,15 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
         }
       );
 
-      // Clear local storage and state
-      localStorage.clear();
-      setIsLoggedIn(false);
+      // Use AuthProvider logout function
+      logout();
       message.success("Logout successful!");
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
 
-      // Even if API fails, force local logout
-      localStorage.clear();
-      setIsLoggedIn(false);
+      // Even if API fails, force local logout using AuthProvider
+      logout();
       navigate("/");
 
       message.error(
@@ -385,7 +372,7 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
               color: "white",
             }}
           >
-            {isLoggedIn ? (
+            {user ? (
               <>
                 <Tooltip title="Notifications">
                   <div style={{ position: "relative", marginRight: "10px" }}>
@@ -426,7 +413,7 @@ const LayoutHeaderSidebar = ({ collapsed, setCollapsed, children }) => {
                 </Tooltip>
 
                 <span style={{ marginRight: "8px" }}>
-                  {userName} - {userRole}
+                  {user?.name} - {user?.role}
                 </span>
 
                 <Tooltip title="Logout">

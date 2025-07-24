@@ -60,114 +60,114 @@
   }
 }
 
-/* Apply animations */
-.hero-text {
+/* Apply animations - scoped to login page */
+.login-page .hero-text {
   animation: fadeInLeft 1s ease-out;
 }
 
-.login-card {
+.login-page .login-card {
   animation: fadeInRight 1s ease-out 0.3s both;
 }
 
-.hero-logo {
+.login-page .hero-logo {
   animation: float 3s ease-in-out infinite;
 }
 
-.feature-item {
+.login-page .feature-item {
   animation: fadeInUp 0.6s ease-out both;
 }
 
-.feature-item:nth-child(1) {
+.login-page .feature-item:nth-child(1) {
   animation-delay: 0.1s;
 }
 
-.feature-item:nth-child(2) {
+.login-page .feature-item:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.feature-item:nth-child(3) {
+.login-page .feature-item:nth-child(3) {
   animation-delay: 0.3s;
 }
 
-/* Hover effects */
-.login-card:hover {
+/* Hover effects - scoped to login page */
+.login-page .login-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 35px 60px rgba(0, 0, 0, 0.3);
 }
 
-.feature-item:hover {
+.login-page .feature-item:hover {
   transform: translateY(-3px);
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Button hover effects */
-button:hover {
+/* Button hover effects - scoped to login page */
+.login-page button:hover {
   transform: translateY(-2px);
 }
 
-/* Input focus effects */
-input:focus {
+/* Input focus effects - scoped to login page */
+.login-page input:focus {
   border-color: #667eea !important;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
   outline: none;
 }
 
-/* Responsive design */
+/* Responsive design - scoped to login page */
 @media (max-width: 768px) {
-  .hero-content {
+  .login-page .hero-content {
     flex-direction: column !important;
     text-align: center !important;
     gap: 40px !important;
   }
   
-  .hero-title {
+  .login-page .hero-title {
     font-size: 2.5rem !important;
   }
   
-  .hero-features {
+  .login-page .hero-features {
     justify-content: center !important;
   }
   
-  .login-card {
+  .login-page .login-card {
     margin: 20px !important;
     padding: 30px !important;
   }
   
-  .footer-content {
+  .login-page .footer-content {
     grid-template-columns: 1fr !important;
     gap: 30px !important;
   }
 }
 
 @media (max-width: 480px) {
-  .hero-title {
+  .login-page .hero-title {
     font-size: 2rem !important;
   }
   
-  .hero-features {
+  .login-page .hero-features {
     flex-direction: column !important;
     align-items: center !important;
   }
   
-  .login-card {
+  .login-page .login-card {
     margin: 10px !important;
     padding: 20px !important;
   }
 }
 
-/* Glassmorphism effect for better visual appeal */
-.login-card {
+/* Glassmorphism effect for better visual appeal - scoped to login page */
+.login-page .login-card {
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
 }
 
-.feature-item {
+.login-page .feature-item {
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
 }
 
-/* Smooth transitions for all interactive elements */
-* {
+/* Smooth transitions for login page elements only */
+.login-page * {
   transition: all 0.3s ease !important;
 }
 
@@ -298,8 +298,8 @@ input:focus {
   animation: particles 15s linear infinite;
 }
 
-/* Additional visual enhancements */
-.hero-section::before {
+/* Additional visual enhancements - scoped to login page */
+.login-page .hero-section::before {
   content: '';
   position: absolute;
   top: 0;
@@ -312,8 +312,8 @@ input:focus {
   z-index: 1;
 }
 
-/* Glassmorphism enhancements */
-.glass-effect {
+/* Glassmorphism enhancements - scoped to login page */
+.login-page .glass-effect {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);

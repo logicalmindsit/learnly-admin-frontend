@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "../../../Utils/api";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -8,105 +8,109 @@ import {
   FiFilter,
   FiDownload,
   FiRefreshCw,
-  FiCreditCard,
   FiCheckCircle,
   FiClock,
-  FiXCircle,
   FiUser,
-  FiCalendar,
   FiTrendingUp,
-  FiInfo,
   FiAlertTriangle,
   FiMoreVertical,
   FiEye,
-  FiEdit3
 } from "react-icons/fi";
+
+// Mock fee records - in real app, this would come from API
+const mockFeeRecords = [
+  {
+    id: 1,
+    participantName: "John Doe",
+    participantEmail: "john.doe@example.com",
+    meetingId: "DM202501001",
+    meetingTitle: "Data Science Bootcamp",
+    feeAmount: 5000,
+    paidAmount: 5000,
+    paymentStatus: "paid",
+    paymentMethod: "UPI",
+    transactionId: "TXN123456789",
+    paymentDate: "2024-01-15T14:30:00Z",
+    dueDate: "2024-01-20T23:59:59Z"
+  },
+  {
+    id: 2,
+    participantName: "Jane Smith",
+    participantEmail: "jane.smith@example.com",
+    meetingId: "DM202501001",
+    meetingTitle: "Data Science Bootcamp",
+    feeAmount: 5000,
+    paidAmount: 0,
+    paymentStatus: "pending",
+    paymentMethod: null,
+    transactionId: null,
+    paymentDate: null,
+    dueDate: "2024-01-20T23:59:59Z"
+  },
+  {
+    id: 3,
+    participantName: "Mike Johnson",
+    participantEmail: "mike.johnson@example.com",
+    meetingId: "DM202501002",
+    meetingTitle: "Machine Learning Workshop",
+    feeAmount: 3500,
+    paidAmount: 3500,
+    paymentStatus: "paid",
+    paymentMethod: "Card",
+    transactionId: "TXN987654321",
+    paymentDate: "2024-01-17T09:15:00Z",
+    dueDate: "2024-01-25T23:59:59Z"
+  },
+  {
+    id: 4,
+    participantName: "Sarah Wilson",
+    participantEmail: "sarah.wilson@example.com",
+    meetingId: "DM202501001",
+    meetingTitle: "Data Science Bootcamp",
+    feeAmount: 5000,
+    paidAmount: 2500,
+    paymentStatus: "partial",
+    paymentMethod: "Bank Transfer",
+    transactionId: "TXN555666777",
+    paymentDate: "2024-01-16T11:45:00Z",
+    dueDate: "2024-01-20T23:59:59Z"
+  }
+];
 
 const MeetingFees = () => {
   const navigate = useNavigate();
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState("");
   const [feeRecords, setFeeRecords] = useState([]); // This would come from a payments API
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Mock fee records - in real app, this would come from API
-  const mockFeeRecords = [
-    {
-      id: 1,
-      participantName: "John Doe",
-      participantEmail: "john.doe@example.com",
-      meetingId: "DM202501001",
-      meetingTitle: "Data Science Bootcamp",
-      feeAmount: 5000,
-      paidAmount: 5000,
-      paymentStatus: "paid",
-      paymentMethod: "UPI",
-      transactionId: "TXN123456789",
-      paymentDate: "2024-01-15T14:30:00Z",
-      dueDate: "2024-01-20T23:59:59Z"
-    },
-    {
-      id: 2,
-      participantName: "Jane Smith",
-      participantEmail: "jane.smith@example.com",
-      meetingId: "DM202501001",
-      meetingTitle: "Data Science Bootcamp",
-      feeAmount: 5000,
-      paidAmount: 0,
-      paymentStatus: "pending",
-      paymentMethod: null,
-      transactionId: null,
-      paymentDate: null,
-      dueDate: "2024-01-20T23:59:59Z"
-    },
-    {
-      id: 3,
-      participantName: "Mike Johnson",
-      participantEmail: "mike.johnson@example.com",
-      meetingId: "DM202501002",
-      meetingTitle: "Machine Learning Workshop",
-      feeAmount: 3500,
-      paidAmount: 3500,
-      paymentStatus: "paid",
-      paymentMethod: "Card",
-      transactionId: "TXN987654321",
-      paymentDate: "2024-01-17T09:15:00Z",
-      dueDate: "2024-01-25T23:59:59Z"
-    },
-    {
-      id: 4,
-      participantName: "Sarah Wilson",
-      participantEmail: "sarah.wilson@example.com",
-      meetingId: "DM202501001",
-      meetingTitle: "Data Science Bootcamp",
-      feeAmount: 5000,
-      paidAmount: 2500,
-      paymentStatus: "partial",
-      paymentMethod: "Bank Transfer",
-      transactionId: "TXN555666777",
-      paymentDate: "2024-01-16T11:45:00Z",
-      dueDate: "2024-01-20T23:59:59Z"
-    }
-  ];
-
   useEffect(() => {
     fetchMeetings();
   }, []);
+
+  const fetchFeeRecords = useCallback(() => {
+    // Mock function - in real app, this would be an API call
+    const selectedMeetingData = meetings.find(m => m._id === selectedMeeting);
+    if (selectedMeetingData) {
+      const meetingFeeRecords = mockFeeRecords.filter(record => 
+        record.meetingId === selectedMeetingData.meet_id
+      );
+      setFeeRecords(meetingFeeRecords);
+    }
+  }, [meetings, selectedMeeting]);
 
   useEffect(() => {
     if (selectedMeeting) {
       fetchFeeRecords();
     }
-  }, [selectedMeeting]);
+  }, [selectedMeeting, fetchFeeRecords]);
 
   const fetchMeetings = async () => {
     try {
-      setLoading(true);
       const response = await axios.get("/get-all-direct-meets", {
         params: { limit: 100, is_active: true }
       });
@@ -117,19 +121,6 @@ const MeetingFees = () => {
     } catch (error) {
       console.error("Error fetching meetings:", error);
       setError("Failed to fetch meetings. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchFeeRecords = () => {
-    // Mock function - in real app, this would be an API call
-    const selectedMeetingData = meetings.find(m => m._id === selectedMeeting);
-    if (selectedMeetingData) {
-      const meetingFeeRecords = mockFeeRecords.filter(record => 
-        record.meetingId === selectedMeetingData.meet_id
-      );
-      setFeeRecords(meetingFeeRecords);
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -48,7 +48,7 @@ const ExamAnswerDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError('');
     
@@ -89,11 +89,11 @@ const ExamAnswerDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedView, currentPage, filterValue]);
 
   useEffect(() => {
     fetchData();
-  }, [selectedView, currentPage]);
+  }, [fetchData]);
 
   const handleViewDetails = async (attemptId) => {
     try {

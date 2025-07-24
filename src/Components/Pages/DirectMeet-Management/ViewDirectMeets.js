@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "../../../Utils/api";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -10,7 +10,6 @@ import {
   FiPlus, 
   FiArrowLeft,
   FiCalendar,
-  FiDollarSign,
   FiMoreVertical,
   FiRefreshCw,
 } from "react-icons/fi";
@@ -34,11 +33,7 @@ const ViewDirectMeets = () => {
 
   const limit = 10;
 
-  useEffect(() => {
-    fetchMeetings();
-  }, [currentPage, searchTerm, statusFilter, activeFilter, sortBy, sortOrder]);
-
-  const fetchMeetings = async () => {
+  const fetchMeetings = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
@@ -65,7 +60,11 @@ const ViewDirectMeets = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, statusFilter, activeFilter, sortBy, sortOrder]);
+
+  useEffect(() => {
+    fetchMeetings();
+  }, [fetchMeetings]);
 
   const handleRefresh = async () => {
     setRefreshing(true);

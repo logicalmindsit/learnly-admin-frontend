@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "../../Utils/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Auth/AuthProvider";
 import logo from "../../assets/logo.png";
 import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
 import AnimatedBackground from "./AnimatedBackground";
@@ -25,6 +26,7 @@ const AdminLogin = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Handle login submission
   const handleLogin = async (e) => {
@@ -40,11 +42,13 @@ const AdminLogin = () => {
         setShowOtpBox(true);
         setMessage("OTP sent to your email. Please verify.");
       } else {
-        // Save token and user data
-        localStorage.setItem("_id", data.id);
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.role);
-        localStorage.setItem("name", data.name);
+        // Use the login function from AuthProvider
+        login({
+          id: data.id,
+          token: data.token,
+          role: data.role,
+          name: data.name
+        });
 
         setMessage("Login successful");
         navigate("/learnly");
@@ -66,11 +70,13 @@ const AdminLogin = () => {
       const response = await axios.post("/verify-otp", { email, otp });
       const { id, token, role, name } = response.data;
 
-      localStorage.setItem("_id", id);
-      localStorage.setItem("token", token);
-      localStorage.setItem("role", role);
-      localStorage.setItem("name", name);
-      localStorage.setItem("isLoggedIn", "true");
+      // Use the login function from AuthProvider
+      login({
+        id: id,
+        token: token,
+        role: role,
+        name: name
+      });
 
       setMessage("OTP verified and login successful");
       setShowOtpBox(false);
@@ -147,7 +153,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="landing-page" style={styles.landingPage}>
+    <div className="landing-page login-page" style={styles.landingPage}>
       {/* Hero Section */}
       <div className="hero-section" style={styles.heroSection}>
         <AnimatedBackground />
@@ -792,11 +798,6 @@ const styles = {
   footer: {
     marginTop: "30px",
     textAlign: "center",
-  },
-  footerText: {
-    fontSize: "12px",
-    color: "#64748b",
-    margin: "5px 0",
   },
   backButton: {
     background: "none",

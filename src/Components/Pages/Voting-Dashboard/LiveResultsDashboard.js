@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { votingApi, handleApiError } from '../../../Utils/votingApi';
 
 const LiveResultsDashboard = () => {
@@ -8,6 +8,27 @@ const LiveResultsDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const intervalRef = useRef(null);
+
+  const fetchLiveResults = useCallback(async () => {
+    if (!selectedPoll) return;
+
+    try {
+      const response = await votingApi.getLiveResults(selectedPoll.poll_id);
+      if (response.data.success) {
+        setLiveResults(response.data.data);
+        setError(''); // Clear any previous errors
+      }
+    } catch (error) {
+      console.error('Error fetching live results:', error);
+      if (error.response?.status === 404) {
+        setError('Poll not found');
+      } else if (error.response?.status === 403) {
+        setError('Access denied to view results');
+      } else {
+        setError(handleApiError(error, 'Failed to fetch live results'));
+      }
+    }
+  }, [selectedPoll]);
 
   useEffect(() => {
     fetchActivePolls();
@@ -34,7 +55,7 @@ const LiveResultsDashboard = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [selectedPoll]);
+  }, [selectedPoll, fetchLiveResults]);
 
   const fetchActivePolls = async () => {
     try {
@@ -51,27 +72,6 @@ const LiveResultsDashboard = () => {
       console.error('Error fetching polls:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchLiveResults = async () => {
-    if (!selectedPoll) return;
-
-    try {
-      const response = await votingApi.getLiveResults(selectedPoll.poll_id);
-      if (response.data.success) {
-        setLiveResults(response.data.data);
-        setError(''); // Clear any previous errors
-      }
-    } catch (error) {
-      console.error('Error fetching live results:', error);
-      if (error.response?.status === 404) {
-        setError('Poll not found');
-      } else if (error.response?.status === 403) {
-        setError('Access denied to view results');
-      } else {
-        setError(handleApiError(error, 'Failed to fetch live results'));
-      }
     }
   };
 

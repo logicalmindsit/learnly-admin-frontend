@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../../../Utils/api'; 
 
@@ -11,16 +11,7 @@ const ResultsDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [resultsLoading, setResultsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchPolls();
-    
-    // If pollId is passed via navigation state, auto-select that poll
-    if (location.state?.pollId) {
-      fetchPollResults(location.state.pollId);
-    }
-  }, [location.state]);
-
-  const fetchPolls = async () => {
+  const fetchPolls = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
@@ -48,7 +39,16 @@ const ResultsDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [location.state]);
+
+  useEffect(() => {
+    fetchPolls();
+    
+    // If pollId is passed via navigation state, auto-select that poll
+    if (location.state?.pollId) {
+      fetchPollResults(location.state.pollId);
+    }
+  }, [fetchPolls, location.state]);
 
   const fetchPollResults = async (pollId) => {
     setResultsLoading(true);
