@@ -702,7 +702,6 @@ const ManageParticipants = () => {
                   placeholder="Enter email address"
                 />
               </div>
-
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
