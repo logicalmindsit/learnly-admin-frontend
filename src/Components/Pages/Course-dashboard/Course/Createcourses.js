@@ -1336,7 +1336,7 @@ const { name, value, files, checked } = e.target; // Added checked
     });
 
     try {
-      await axios.post("/CreateCoursess", data, {
+      await axios.post("/createcourses", data, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
